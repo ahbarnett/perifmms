@@ -1,5 +1,5 @@
-function O = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,...
-                     nt,t,ipott,igrt,ihet,e1,e2,o)
+function [O U] = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,...
+                         nt,t,ipott,igrt,ihet,e1,e2,o)
 % draft of doubly periodic in 2D Laplace wrapper around CMCL FMMs.
 %
 % kernel is usual (1/2pi) log (1/r), which is -1/2pi times the odd CMCL
@@ -68,7 +68,8 @@ ng = 100; x = 2*(1:ng)/ng-1; [xx yy] = meshgrid(x);
 tt = [xx(:)';yy(:)']; nt = numel(xx);
 ipott = 1; igrt=0;ihet=0;
 o.verb = 1; o.noperi = 1;
-O = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,tt,ipott,igrt,ihet,e1,e2,o)
-imagesc(x,x,reshape(real(O.pottarg),ng,ng)); caxis([-1 1]); colorbar;
+[O U] = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,tt,ipott,igrt,ihet,e1,e2,o);
+imagesc(x,x,reshape(real(O.pottarg),ng,ng)); caxis(10*[-1 1]); colorbar;
+showunitcell(U);
 
 % then check periodicity w/ 4 targs
