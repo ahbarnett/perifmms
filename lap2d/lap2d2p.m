@@ -25,9 +25,7 @@ M = ceil(80*badness);          % # proxy
 Rp = 1.4; p.c = Rp * exp(1i*(0:M-1)'/M*2*pi);   % circle
 p.x = e1*real(p.c) + e2*imag(p.c);     % ellipse
 p = setupquad(p);         % adds s.w weights and s.nx normals to proxy
-if o.verb, figure; showsegment({L R T B}); hold on; plot(p.x,'r.');
-  plot(s(1,:),s(2,:),'k.'); plot(t(1,:),t(2,:),'.');
-end
+if o.verb, figure; showsegment({L R T B}); hold on; plot(p.x,'r.'); end
 % periodizing solve Q block
 warning('off','MATLAB:nearlySingularMatrix')  % backward-stable ill-cond is ok!
 warning('off','MATLAB:rankDeficientMatrix')
@@ -69,7 +67,7 @@ tt = [xx(:)';yy(:)']; nt = numel(xx);
 ipott = 1; igrt=0;ihet=0;
 o.verb = 1; o.noperi = 1;
 [O U] = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,tt,ipott,igrt,ihet,e1,e2,o);
-imagesc(x,x,reshape(real(O.pottarg),ng,ng)); caxis(10*[-1 1]); colorbar;
-showunitcell(U);
+imagesc(x,x,reshape(real(O.pottarg),ng,ng)); caxis(ns*[-1 1]); colorbar;
+showunitcell(U); plot(s(1,:),s(2,:),'w.'); 
 
 % then check periodicity w/ 4 targs
