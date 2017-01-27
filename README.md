@@ -2,7 +2,17 @@
 
 Alex Barnett   1/26/17
 
-Periodized evaluations of Green's function kernels using a black-box fast multipole method (FMM) combined with low-rank periodizing method for essentially arbitrary unit cell geometries.
+Periodized evaluations of Green's function kernels using a black-box fast multipole method combined with low-rank periodizing scheme for general skew unit cell geometries.
+
+Currently just doubly-periodic Laplace in 2D.
+
+Simplifying assumptions for now:
+  * no self-evals just extra targs.
+  * source strengths are compatible w/ periodizing.
+  * all sources and targs lie in the unit cell.
+  * unit cell is centered on origin.
+Be warned that the assumptions applying to input data are not yet tested.
+
 
 ### Dependencies
 
@@ -12,15 +22,15 @@ Periodized evaluations of Green's function kernels using a black-box fast multip
 ### Installation
 
 1. Download using `git`, `svn`, or as a zip (see green button above).
-1. Download and install http://www.cims.nyu.edu/cmcl/fmm2dlib/fmm2dlib.html, and make sure the matlab interfaces work.
-1. Make sure fmmlib2d/matlab is in your matlab path
-1. Testing: in matlab run `cd lap2d; lap2d2p`. Should produce plot of a periodic potential due to some dipoles.
+1. Download and install http://www.cims.nyu.edu/cmcl/fmm2dlib/fmm2dlib.html, and make sure the matlab interfaces work. If you have R2016b you may have trouble with openmp  and mex; if so, poke in the fmmlib2d makefiles to build the single-thread mex executable.
+1. Make sure fmmlib2d/matlab is in your matlab path.
+1. Testing: in matlab run `cd lap2d; lap2d2p`. Should report errors less than 1e-12 then produce plot of a periodic potential due to some dipoles.
 
-Usage: see driver code at bottom of `lap2d2p`
+Usage: see test/driver code at bottom of `lap2d2p`
 
 ### References
 
-Some of the ideas are based upon those in the following papers:
+The scheme is a distillation of ideas from the following sequence of papers (in reverse chronologocal order):
 
 A unified integral equation scheme for doubly-periodic Laplace and Stokes boundary value problems in two dimensions, A. H. Barnett, G. Marple, S. Veerapaneni, and L. Zhao, submitted, Comm. Pure Appl. Math., 29 pages (2016). https://arxiv.org/abs/1611.08038
 
