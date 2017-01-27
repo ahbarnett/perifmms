@@ -3,10 +3,10 @@ function [O U] = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,...
 % draft of doubly periodic in 2D Laplace wrapper around CMCL FMMs.
 %
 % Simplifying assumptions for now:
-%  * no self-evals just extra targs.
+%  * no self-evals just extra targs. todo: fix this for self-eval!
 %  * source strengths compatible w/ periodizing.
 %  * all sources and targs lie in the unit cell.
-%  * unit cell centered on origin.
+%  * unit cell centered on origin (seems reasonable)
 %
 % kernel is usual (1/2pi) log (1/r). Note this is -1/2pi times the CMCL
 % normalization. Coordinates are as stacks of 2-cmpt real col vecs.
@@ -97,7 +97,8 @@ function test_lap2d2p    % tests and shows example usage
 e1 = 1-.2i; e2 = 0.5+1i;   % lattice vecs as C numbers
 iprec = 4;
 rng(0);
-ns = 10; s = e1*(rand(1,ns)-0.5)+e2*(rand(1,ns)-0.5);  % locs in UC
+ns = 10;   % or try 10000
+s = e1*(rand(1,ns)-0.5)+e2*(rand(1,ns)-0.5);  % locs in UC
 s = [real(s);imag(s)];  % 2-by-ns
 ich = 0;ch = 0;   % no charge sources
 idip=1; dz = randn(1,ns)+1i*randn(1,ns);   % random dipoles as complex #
@@ -108,15 +109,17 @@ ipott=1; igrt=1; ihet=0;        % periodizing accuracy test at 4 corners of UC
 tt = -(e1+e2)/2 + [0 e1 e2 e1+e2]; tt = [real(tt);imag(tt)]; nt=size(tt,2);
 o.verb = 0;
 O = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,tt,ipott,igrt,ihet,e1,e2,o);
-u = real(O.pottarg); ue = max(u)-min(u);       % worst-case btw 4 corners
-gu = real(O.gradtarg); gue = norm(max(gu,[],2)-min(gu,[],2));
+% extract potential and gradient...
+u = real(O.pottarg); ue = max(u)-min(u);    % worst-case btw 4 corners
+gu = real(O.gradtarg); gue = norm(max(gu,[],2)-min(gu,[],2));  % "
 fprintf('pointwise periodicity errors: potential %.3g, gradient %.3g\n',ue,gue)
 
 ng = 100; x = 2*(1:ng)/ng-1; [xx yy] = meshgrid(x);  % fun plotting test
 tt = [xx(:)';yy(:)']; nt = numel(xx);
 ipott=1; igrt=0; ihet=0;
-o.verb = 2;
+o.verb = 2; tic
 [O U] = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,tt,ipott,igrt,ihet,e1,e2,o);
-u = real(O.pottarg);
+fprintf('%d periodized src to %g targs in %.3g s\n',ns,nt,toc)
+u = real(O.pottarg);  % extract the potential
 imagesc(x,x,reshape(u,ng,ng)); caxis(3*[-1 1]+mean(u)); colorbar;
 showunitcell(U); plot(s(1,:),s(2,:),'w.'); 
