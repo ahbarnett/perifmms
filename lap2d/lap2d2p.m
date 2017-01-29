@@ -1,11 +1,13 @@
 function [O U] = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,...
                          nt,t,ipott,igrt,ihet,e1,e2,o)
-% draft of doubly periodic in 2D Laplace wrapper around CMCL FMMs.
+% draft of doubly periodic in 2D Laplace wrapper around CMCL FMM. Interface is
+% similar to FMM in that it includes sources which can be targets (and i.neq.j
+% is taken in the sum), plus additional targets. The potentials are only
+% defined up to a constant.
 %
 % Simplifying assumptions for now:
-%  * no self-evals just extra targs. todo: fix this for self-eval!
-%  * source strengths compatible w/ periodizing.
-%  * all sources and targs lie in the unit cell.
+%  * source strengths are compatible w/ periodizing.
+%  * all sources and targs lie in the unit cell (or close to it).
 %  * unit cell centered on origin (seems reasonable)
 %
 % kernel is usual (1/2pi) log (1/r). Note this is -1/2pi times the CMCL
@@ -68,18 +70,26 @@ s8 = [s8 [real(p.x),imag(p.x)]'];     % append SLP proxy locs
 ch8 = [ch8 (p.w.*co)'/cmcl]; dst8 = [dst8 zeros(1,M)]; dv8 = [dv8 zeros(2,M)];
 ns8 = size(s8,2);
 
-% *** case no self-evals for now (ipot,igr,ihe = 0)
-
 % eval the original sources at self and/or targs...
 O = lfmm2dpart(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,t,...
              ipott,igrt,ihet);
+
 if ~o.noperi   % add in the periodizing part to answers
-  % eval the 8 copies + proxies at targs...
-  O8 = lfmm2dpart(iprec,ns8,s8,1,ch8,idip,dst8,dv8,0,0,0,nt,t,...
-                  ipott,igrt,ihet);
-  if ipott, O.pottarg = O.pottarg + O8.pottarg; end
-  if igrt, O.gradtarg = O.gradtarg + O8.gradtarg; end
-  if ihet, O.hesstarg = O.hesstarg + O8.hesstarg; end
+  srceval = ipot || igr || ihe; % if so, append to targs list for periodizing
+  if srceval, t = [s t]; nst = ns+nt; ti=ns+(1:nt);   % ti = targ inds in t
+    ipott8 = ipot | ipott; igrt8 = igr | igrt; ihet8 = ihe | ihet;
+  else
+    nst = nt; ti = 1:nt; ipott8=ipott; igrt8=igrt; ihet8=ihet;  % just targs
+  end
+  % eval the 8 copies + proxies at all targs (of course no self-eval here)...
+  O8 = lfmm2dpart(iprec,ns8,s8,1,ch8,idip,dst8,dv8,0,0,0,nst,t,...
+                  ipott8,igrt8,ihet8);
+  if ipot, O.pot = O.pot + O8.pottarg(1:ns); end
+  if igr, O.grad = O.grad + O8.gradtarg(:,1:ns); end
+  if ihe, O.hess = O.hess + O8.hesstarg(:,1:ns); end
+  if ipott, O.pottarg = O.pottarg + O8.pottarg(ti); end
+  if igrt, O.gradtarg = O.gradtarg + O8.gradtarg(:,ti); end
+  if ihet, O.hesstarg = O.hesstarg + O8.hesstarg(:,ti); end
 end
 
 function Q = Qmat(p,L,R,B,T,proxyrep) % matrix Q given proxy and colloc pts
@@ -103,7 +113,7 @@ s = [real(s);imag(s)];  % 2-by-ns
 ich = 0;ch = 0;   % no charge sources
 idip=1; dz = randn(1,ns)+1i*randn(1,ns);   % random dipoles as complex #
 dst = abs(dz); dv = [real(dz)./dst;imag(dz)./dst]; dv(isnan(dv)) = 0; % convert to strength, direction
-ipot = 0; igr = 0; ihe = 0; % want no self-eval at srcs
+ipot = 1; igr = 1; ihe = 0; % what is wanted for self-interactions (i.neq.j)
 
 ipott=1; igrt=1; ihet=0;        % periodizing accuracy test at 4 corners of UC
 tt = -(e1+e2)/2 + [0 e1 e2 e1+e2]; tt = [real(tt);imag(tt)]; nt=size(tt,2);
@@ -113,6 +123,8 @@ O = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,tt,ipott,igrt,ihet,e1,
 u = real(O.pottarg); ue = max(u)-min(u);    % worst-case btw 4 corners
 gu = real(O.gradtarg); gue = norm(max(gu,[],2)-min(gu,[],2));  % "
 fprintf('pointwise periodicity errors: potential %.3g, gradient %.3g\n',ue,gue)
+%u = real(O.pot(2:end) - O.pot(1))  % check self-eval converges varying M, etc
+%real(O.grad)   % check conv
 
 ng = 100; x = 2*(1:ng)/ng-1; [xx yy] = meshgrid(x);  % fun plotting test
 tt = [xx(:)';yy(:)']; nt = numel(xx);

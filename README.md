@@ -7,11 +7,11 @@ Periodized evaluations of Green's function kernels using a black-box fast multip
 Currently just doubly-periodic Laplace in 2D.
 
 Simplifying assumptions for now:
-  * no self-evals just extra targs.
-  * source strengths are compatible w/ periodizing.
-  * all sources and targs lie in the unit cell.
-  * unit cell is centered on origin.
-Be warned that the assumptions applying to input data are not yet tested.
+  * source strengths are compatible w/ periodizing (this is not tested; answers of size 1e16 will result if it does not hold)
+  * all sources and targs lie in the unit cell, or close to it.
+  * unit cell is centered on origin, and its aspect ratio is not too extreme (up to of order 10 is fine).
+
+The answer is only defined up to an overall constant in potential (gradients ans hessians are uniquely defined). The interface is identical to the CMCL FMM but with extra arguments describing the unit cell and other options.
 
 
 ### Dependencies
@@ -22,7 +22,7 @@ Be warned that the assumptions applying to input data are not yet tested.
 ### Installation
 
 1. Download using `git`, `svn`, or as a zip (see green button above).
-1. Download and install http://www.cims.nyu.edu/cmcl/fmm2dlib/fmm2dlib.html, and make sure the matlab interfaces work. If you have R2016b you may have trouble with openmp  and mex; if so, poke in the fmmlib2d makefiles to build the single-thread mex executable.
+1. Download and install http://www.cims.nyu.edu/cmcl/fmm2dlib/fmm2dlib.html, and make sure the matlab interfaces work. If you have R2016b you may have trouble with openmp  and mex; if so, poke in the fmmlib2d makefiles to build the single-thread mex executable for now.
 1. Make sure fmmlib2d/matlab is in your matlab path.
 1. Testing: in matlab run `cd lap2d; lap2d2p`. Should report errors less than 1e-12 then produce plot of a periodic potential due to some dipoles.
 
