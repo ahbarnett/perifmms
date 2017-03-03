@@ -21,11 +21,9 @@ function [O U] = lap2d2p(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,...
 % todo:
 % 1) think about reading off and enforcing nonzero potential drops R-L and
 %  T-B from the requested sources...
+% 2) use closer square proxy w/ cuboid discrep bookkeeping, cut 8N->3N.
 %
-% Barnett
-%   initial version afternoon of 1/26/17
-%   additional non-src targets 1/28/17
-%   switch from proxy ellipse and 3x3 -> proxy box and 2x2, 2/22/17
+% Barnett, afternoon of 1/26/17; 1/28/17
 if nargin==0, test_lap2d2p; return; end
 if nargin<19, o=[]; end
 if ~isfield(o,'verb'), o.verb=0; end     % how much diagnostic output

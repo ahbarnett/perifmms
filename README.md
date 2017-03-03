@@ -1,6 +1,6 @@
 # perifmms
 
-Alex Barnett   1/26/17
+Alex Barnett   2/22/17
 
 Periodized evaluations of Green's function kernels using a black-box fast multipole method combined with low-rank periodizing scheme for general skew unit cell geometries.
 
@@ -9,9 +9,9 @@ Currently just doubly-periodic Laplace in 2D.
 Simplifying assumptions for now:
   * source strengths are compatible w/ periodizing (this is not tested; answers of size 1e16 will result if it does not hold)
   * all sources and targs lie in the unit cell, or close to it.
-  * unit cell is centered on origin, and its aspect ratio is not too extreme (up to of order 10 is fine).
+  * unit cell is centered on origin, and its aspect ratio is not too extreme (up to around 10 is fine).
 
-The answer is only defined up to an overall constant in potential (gradients ans hessians are uniquely defined). The interface is identical to the CMCL FMM but with extra arguments describing the unit cell and other options.
+The answer is only defined up to an overall constant in potential (gradients ans hessians are uniquely defined). The interface is designed to be identical to the CMCL FMM, except with extra arguments describing the unit cell and other options.
 
 
 ### Dependencies
@@ -30,7 +30,7 @@ Usage: see test/driver code at bottom of `lap2d2p`
 
 ### References
 
-The scheme is a distillation of ideas from the following sequence of papers (in reverse chronologocal order):
+The scheme is a distillation of ideas from the following sequence of papers (in reverse chronological order):
 
 A unified integral equation scheme for doubly-periodic Laplace and Stokes boundary value problems in two dimensions, A. H. Barnett, G. Marple, S. Veerapaneni, and L. Zhao, submitted, Comm. Pure Appl. Math., 29 pages (2016). https://arxiv.org/abs/1611.08038
 
@@ -42,3 +42,6 @@ A new integral representation for quasi-periodic scattering problems in two dime
 
 A new integral representation for quasi-periodic fields and its application to two-dimensional band structure calculations, Alex Barnett and Leslie Greengard, J. Comput. Phys., 229 (19), 6898-6914 (2010). https://arxiv.org/abs/1001.5464
 
+### Notes
+
+* initial version 1/26/17
