@@ -52,7 +52,7 @@ if ~isfield(o,'verb'), o.verb=0; end           % how much diagnostic output
 if ~isfield(o,'noperi'), o.noperi=0; end
 e1 = v1(1)+1i*v1(2); e2 = v2(1)+1i*v2(2);      % unit cell vecs as C#s.
 AU = [v1 v2];          % lattice vector matrix
-badness = cond(AU);    % cond(lattice vector matrix)
+badness = max(1.3,cond(AU));    % cond(lattice vector matrix)
 if badness>10, warning('unit cell close to singular: will be slow & bad!'); end
 cmcl = -2*pi;          % factor by which CMCL normalization is off
 ch = ch(:)'*(1/cmcl); dst = dst(:)'*(1/cmcl);  % correct & ensure row vecs

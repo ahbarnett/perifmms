@@ -28,6 +28,8 @@ The answer is only defined up to an overall constant in potential (gradients ans
 
 Usage: see test/driver code at bottom of `lfmm2d2ppart`
 
+Note: to run the old 3x3 version, do `addpath old; lap2d2p`
+
 ### References
 
 The scheme is a distillation of ideas from the following sequence of papers (in reverse chronological order):

@@ -110,6 +110,7 @@ m = numel(f)/6; f = f(1:3*m)-f(3*m+1:6*m); f = f(1:m)+f(m+1:2*m)+f(2*m+1:end);
 %%%%%%%
 function test_lap2d2p    % tests and shows example usage
 e1 = 1-.2i; e2 = 0.5+1i;   % lattice vecs as C numbers
+e1 = 1; e2 = 1i;   % unit square
 iprec = 4;
 rng(0);
 ns = 10;   % or try 10000
