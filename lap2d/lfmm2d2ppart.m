@@ -56,15 +56,16 @@ badness = max(1.3,cond(AU));    % cond(lattice vector matrix)
 if badness>10, warning('unit cell close to singular: will be slow & bad!'); end
 cmcl = -2*pi;          % factor by which CMCL normalization is off
 ch = ch(:)'*(1/cmcl); dst = dst(:)'*(1/cmcl);  % correct & ensure row vecs
+digitlist = [0 1 2 3 6 9 12 15]; digits = digitlist(iprec+3);  % log10(tol)
 
 % collocation walls
 tt=timetic; tic(tt);             % internal timings
 U.e1 = e1; U.e2 = e2; U.v1 = v1; U.v2 = v2;
-m = ceil(20*badness);            % # colloc pts per wall
+m = ceil(5+1.3*digits*badness);            % # colloc pts per wall
 [U L R B T] = doublywalls(U,m);  % note U is unit cell not CMCL U.
 n1 = T.nx(1); n2 = R.nx(1);           % the two wall normals
 % proxy pts, uniform on (fixed) 2x scaled unit cell
-M = ceil(25*badness);          % # proxy per wall
+M = ceil(5+1.6*digits*badness);          % # proxy per wall
 z = 2*(0.5:M-0.5)'/M-1;            % col vec of nodes in [-1,1)
 p.x = [-e2+z*e1; e1+z*e2; e2+z*e1; -e1+z*e2];  % box
 p.nx = kron([-n1;n2;n1;-n2],ones(M,1));  % outward normals (only needs for DLP)
@@ -151,9 +152,8 @@ v1 = [1; -.2]; v2 = [.5; 1];   % lattice vectors (must be column vectors)
 %v1 = [1; 1]; v2 = [.5; 1];     % badness 6
 %v1 = [1;0]; v2 = [0;.1];       % aspectratio 10
 %v1 = [.1;0]; v2 = [0;1];       % "
-iprec = 4;
 rng(0);    % fix random seed
-ns = 10;   % number of sources ...try 1e4
+ns = 1e4;   % number of sources ...try 10 or 1e4 or more
 s = v1*(rand(1,ns)-0.5)+v2*(rand(1,ns)-0.5);  % 2*ns locs in UC
 ich = 0; ch = 0;   % no charge sources
 idip=1; dz = randn(1,ns)+1i*randn(1,ns);   % random dipoles as complex #
@@ -164,15 +164,18 @@ ipott=1; igrt=1; ihet=0;        % periodizing accuracy test at 4 corners of UC
 e1 = v1(1)+1i*v1(2); e2 = v2(1)+1i*v2(2);      % unit cell vecs as C#s
 tt = -(e1+e2)/2 + [0 e1 e2 e1+e2]; tt = [real(tt);imag(tt)]; nt=size(tt,2);
 o.verb = 0;
-O = lfmm2d2ppart(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,tt,ipott,igrt,ihet,v1,v2,o);
-% extract potential and gradient, get their errors...
-u = real(O.pottarg); ue = max(u)-min(u);    % worst-case btw 4 corners
-gu = real(O.gradtarg); gue = norm(max(gu,[],2)-min(gu,[],2));  % "
-uer = ue/max(abs(u)); guer = gue/norm(max(gu,[],2));    % relative errors
-fprintf('pointwise periodicity relative errors: pot %.3g, grad %.3g\n',uer,guer)
+for iprec=1:5   % check different requested accuracies
+  O = lfmm2d2ppart(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,tt,ipott,igrt,ihet,v1,v2,o);
+  % extract potential and gradient, get their errors...
+  u = real(O.pottarg); ue = max(u)-min(u);    % worst-case btw 4 corners
+  gu = real(O.gradtarg); gue = norm(max(gu,[],2)-min(gu,[],2));  % "
+  uer = ue/max(abs(u)); guer = gue/norm(max(gu,[],2));    % relative errors
+  fprintf('iprec=%d: ptwise periodicity relative errors: pot %.3g, grad %.3g\n',iprec,uer,guer)
+end
 %u = real(O.pot(2:end) - O.pot(1))  % check self-eval converges varying M, etc
 %real(O.grad)   % check conv
 
+iprec = 4;
 ng = 100; x = 2*(1:ng)/ng-1; [xx yy] = meshgrid(x);  % fun plotting test
 tt = [xx(:)';yy(:)']; nt = numel(xx);
 ipott=1; igrt=0; ihet=0;
