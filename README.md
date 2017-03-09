@@ -1,6 +1,6 @@
 # perifmms
 
-Alex Barnett   2/22/17
+Alex Barnett   3/8/17
 
 Periodized evaluations of Green's function kernels using a black-box fast multipole method combined with low-rank periodizing scheme for general skew unit cell geometries.
 
@@ -24,9 +24,9 @@ The answer is only defined up to an overall constant in potential (gradients ans
 1. Download using `git`, `svn`, or as a zip (see green button above).
 1. Download and install http://www.cims.nyu.edu/cmcl/fmm2dlib/fmm2dlib.html, and make sure the matlab interfaces work. If you have R2016b you may have trouble with openmp  and mex; if so, poke in the fmmlib2d makefiles to build the single-thread mex executable for now.
 1. Make sure fmmlib2d/matlab is in your matlab path.
-1. Testing: in matlab run `cd lap2d; lap2d2p`. Should report errors less than 1e-12 then produce plot of a periodic potential due to some dipoles.
+1. Testing: in matlab run `cd lap2d; lfmm2d2ppart`. Should report errors less than 1e-12 then produce plot of a periodic potential due to some dipoles.
 
-Usage: see test/driver code at bottom of `lap2d2p`
+Usage: see test/driver code at bottom of `lfmm2d2ppart`
 
 ### References
 
@@ -44,4 +44,5 @@ A new integral representation for quasi-periodic fields and its application to t
 
 ### Notes
 
-* initial version 1/26/17
+* initial version 1/26/17  
+* name change, 2x2 instead of 3x3 neighbor lists, square proxy, 3/8/17  
