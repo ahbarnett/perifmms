@@ -59,7 +59,7 @@ ch = ch(:)'*(1/cmcl); dst = dst(:)'*(1/cmcl);  % correct & ensure row vecs
 digitlist = [0 1 2 3 6 9 12 15]; digits = digitlist(iprec+3);  % log10(tol)
 
 % collocation walls
-tt=timetic; tic(tt);             % internal timings
+tt=tic;             % internal timings
 U.e1 = e1; U.e2 = e2; U.v1 = v1; U.v2 = v2;
 m = ceil(5+1.3*digits*badness);            % # colloc pts per wall
 [U L R B T] = doublywalls(U,m);  % note U is unit cell not CMCL U.
@@ -76,7 +76,7 @@ Q = Qmat(p,L,R,B,T,@LapSLP);    % use proxy monopoles
 if o.verb, fprintf('Q fill\t\t%.3f s;\tbadness %.3g, Nprox=%d, m=%d\n',toc(tt),badness,4*M,m), end
 
 % compute discrep: one src to 8 targ wall copies (ns -> around 200 targs)
-tic(tt);
+tt=tic;
 tw = [R.x-e2;R.x;L.x-e1-e2;L.x-e1; T.x-e1;T.x;B.x-e1-e2;B.x-e2].'; %row vec in C
 tw = [real(tw);imag(tw)];   % 2-by-n format
 s0 = inv(AU)*s;             % srcs mapped back to [-1/2,1/2]^2
@@ -90,7 +90,7 @@ gn = discrepblk([real(n1),imag(n1)] * W.gradtarg(:,4*m+1:end));
 d = -real([f,fn,g,gn])';     % cancel out discrep col vec
 if o.verb, fprintf('discrep\t\t%.3f s\n',toc(tt)), end
 
-tic(tt);
+tt=tic;
 warning('off','MATLAB:nearlySingularMatrix')  % backward-stable ill-cond is ok!
 warning('off','MATLAB:rankDeficientMatrix')
 lso.RECT = true;  % linsolve opts, forces QR even when square (LU much worse)
@@ -98,7 +98,7 @@ co = linsolve(Q,d,lso);     % solve for proxy coeffs col vec
 if o.verb, fprintf('linsolve\t%.3f s;\tnorm(co)=%.3g\n',toc(tt),norm(co)); end
 
 % eval the original sources at self and/or targs...
-tic(tt);
+tt=tic;
 O = lfmm2dpart(iprec,ns,s,ich,ch,idip,dst,dv,ipot,igr,ihe,nt,t,...
              ipott,igrt,ihet);
 if o.verb, fprintf('self FMM\t%.3f s\n',toc(tt)), end
@@ -124,7 +124,7 @@ if ~o.noperi   % add in the periodizing part to answers
     nst = nt; ti = 1:nt; ipott3=ipott; igrt3=igrt; ihet3=ihet;  % just targs
   end
   % eval the 3 copies + proxies at all targs (of course no self-eval here)...
-  tic(tt);
+  tt=tic;
   O3 = lfmm2dpart(iprec,ns3,s3,1,ch3,idip,dst3,dv3,0,0,0,nst,t,...
                   ipott3,igrt3,ihet3);
   if o.verb, fprintf('3N nei+pxy FMM\t%.3f s\n',toc(tt)), end
